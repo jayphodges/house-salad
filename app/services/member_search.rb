@@ -5,24 +5,22 @@ class MemberSearch
   end
 
   def members
-    raw_members = PropublicaService.new.filter_by_state(us_state)
-    @members = raw_members.each do |raw_member|
-      Member.new(raw_member)
-    end
-
-    conn = Faraday.new(url: "https://api.propublica.org") do |faraday|
-      faraday.headers["X-API-KEY"] = ENV["PROPUBLICA_API_KEY"]
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get("/congress/v1/members/house/#{us_state}/current.json")
-
-    @members = JSON.parse(response.body, symbolize_names: true)[:results].map do |raw_member|
+    raw_members.map do |raw_member|
       Member.new(raw_member)
     end
   end
 
   private
     attr_reader :us_state
+
+    def service
+      PropublicaService.new
+    end
+
+    def raw_members
+      service.filter_by_state(us_state)[:results]
+    end
+
+
 
 end
