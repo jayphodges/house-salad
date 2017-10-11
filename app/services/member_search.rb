@@ -5,9 +5,10 @@ class MemberSearch
   end
 
   def members
-    # @members = raw_members.each do |raw_member|
-    #   Member.new(raw_member)
-    # end
+    raw_members = PropublicaService.new.filter_by_state(us_state)
+    @members = raw_members.each do |raw_member|
+      Member.new(raw_member)
+    end
 
     conn = Faraday.new(url: "https://api.propublica.org") do |faraday|
       faraday.headers["X-API-KEY"] = ENV["PROPUBLICA_API_KEY"]
