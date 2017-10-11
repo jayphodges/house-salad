@@ -1,5 +1,9 @@
 class SearchController < ApplicationController
   def index
+    @members = MemberSearch.all_by_state(params[:state]).members
+
+
+
     state = params[:state]
     @conn = Faraday.new(url: "https://api.propublica.org") do |faraday|
       faraday.headers["X-API-KEY"] = ENV["PROPUBLICA_API_KEY"]
@@ -11,8 +15,5 @@ class SearchController < ApplicationController
     @members = JSON.parse(response.body, symbolize_names: true)[:results].map do |raw_member|
       Member.new(raw_member)
     end
-
-    @search = MemberSearch.all_by_state(params[:state]).members
-
   end
 end
